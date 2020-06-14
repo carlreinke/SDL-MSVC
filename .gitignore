@@ -1,0 +1,13 @@
+.vs/
+*.user
+
+/VisualC/SDL/x86/Debug
+/VisualC/SDL/x86/Release
+/VisualC/SDL/x64/Debug
+/VisualC/SDL/x64/Release
+/VisualC/SDLmain/x86/Debug
+/VisualC/SDLmain/x86/Release
+/VisualC/SDLmain/x86/Release_NoSTDIO
+/VisualC/SDLmain/x64/Debug
+/VisualC/SDLmain/x64/Release
+/VisualC/SDLmain/x64/Release_NoSTDIO
