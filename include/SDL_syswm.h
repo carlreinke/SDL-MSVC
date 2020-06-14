@@ -31,6 +31,40 @@
 #include "SDL_error.h"
 #include "SDL_version.h"
 
+#ifndef SDL_PROTOTYPES_ONLY
+
+/* This is the structure for custom window manager events */
+#if defined(SDL_VIDEO_DRIVER_X11)
+#if defined(__APPLE__) && defined(__MACH__)
+/* conflicts with Quickdraw.h */
+#define Cursor X11Cursor
+#endif
+
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
+
+#if defined(__APPLE__) && defined(__MACH__)
+/* matches the re-define above */
+#undef Cursor
+#endif
+
+#elif defined(SDL_VIDEO_DRIVER_NANOX)
+#include <microwin/nano-X.h>
+
+#elif defined(SDL_VIDEO_DRIVER_WINDIB) || defined(SDL_VIDEO_DRIVER_DDRAW) || defined(SDL_VIDEO_DRIVER_GAPI)
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
+#elif defined(SDL_VIDEO_DRIVER_RISCOS)
+
+#elif defined(SDL_VIDEO_DRIVER_PHOTON)
+#include <sys/neutrino.h>
+#include <Ph.h>
+
+#endif /* video driver type */
+
+#endif /* SDL_PROTOTYPES_ONLY */
+
 #include "begin_code.h"
 /* Set up for C function definitions, even when using C++ */
 #ifdef __cplusplus
@@ -50,19 +84,6 @@ typedef struct SDL_SysWMinfo SDL_SysWMinfo;
 
 /* This is the structure for custom window manager events */
 #if defined(SDL_VIDEO_DRIVER_X11)
-#if defined(__APPLE__) && defined(__MACH__)
-/* conflicts with Quickdraw.h */
-#define Cursor X11Cursor
-#endif
-
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
-
-#if defined(__APPLE__) && defined(__MACH__)
-/* matches the re-define above */
-#undef Cursor
-#endif
-
 /** These are the various supported subsystems under UNIX */
 typedef enum {
 	SDL_SYSWM_X11
@@ -114,8 +135,6 @@ typedef struct SDL_SysWMinfo {
 } SDL_SysWMinfo;
 
 #elif defined(SDL_VIDEO_DRIVER_NANOX)
-#include <microwin/nano-X.h>
-
 /** The generic custom event structure */
 struct SDL_SysWMmsg {
 	SDL_version version;
@@ -129,9 +148,6 @@ typedef struct SDL_SysWMinfo {
 } SDL_SysWMinfo;
 
 #elif defined(SDL_VIDEO_DRIVER_WINDIB) || defined(SDL_VIDEO_DRIVER_DDRAW) || defined(SDL_VIDEO_DRIVER_GAPI)
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
 /** The windows custom event structure */
 struct SDL_SysWMmsg {
 	SDL_version version;
@@ -166,9 +182,6 @@ typedef struct SDL_SysWMinfo {
 } SDL_SysWMinfo;
 
 #elif defined(SDL_VIDEO_DRIVER_PHOTON)
-#include <sys/neutrino.h>
-#include <Ph.h>
-
 /** The QNX custom event structure */
 struct SDL_SysWMmsg {
 	SDL_version version;
