@@ -1,0 +1,40 @@
+version: '{build}'
+pull_requests:
+  do_not_increment_build_number: true
+image: Visual Studio 2019
+clone_depth: 1
+clone_folder: C:\projects\SDL\
+build_script:
+- ps: |
+    $ErrorActionPreference = "Stop"
+
+    foreach ($platform in "Win32","x64")
+    {
+      msbuild "VisualC\SDL.sln" /p:Configuration=Release /p:Platform=$platform /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+      if ($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode)  }
+    }
+
+    New-Item "SDL-1.2.15\lib" -ItemType Directory -Force | Out-Null
+    foreach ($platform in "x86","x64")
+    {
+      New-Item "SDL-1.2.15\lib\$platform" -ItemType Directory -Force | Out-Null
+      foreach ($f in "SDL.dll","SDL.lib")
+      {
+        Copy-Item "VisualC\SDL\$platform\Release\$f" "SDL-1.2.15\lib\$platform\"
+      }
+      Copy-Item "VisualC\SDLmain\$platform\Release\SDLmain.lib" "SDL-1.2.15\lib\$platform\"
+    }
+
+    Copy-Item "docs\" "SDL-1.2.15\"
+    Copy-Item "docs\html","docs\images","docs\index.html" "SDL-1.2.15\docs\" -Recurse
+    Copy-Item "include\" "SDL-1.2.15\"
+    Copy-Item "include\*.h" "SDL-1.2.15\include\"
+    Copy-Item "docs.html","README-SDL.txt","VisualC.html" "SDL-1.2.15\"
+    Copy-Item "BUGS" "SDL-1.2.15\BUGS.txt"
+    Copy-Item "COPYING" "SDL-1.2.15\COPYING.txt"
+    Copy-Item "README" "SDL-1.2.15\README.txt"
+    Copy-Item "WhatsNew" "SDL-1.2.15\WhatsNew.txt"
+
+    7z a "SDL-devel-1.2.15-VS2019.zip" "SDL-1.2.15"
+artifacts:
+- path: SDL-devel-1.2.15-VS2019.zip
